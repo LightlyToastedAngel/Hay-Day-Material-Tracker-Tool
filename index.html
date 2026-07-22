@@ -1,0 +1,2272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hay Day Material Tracker</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #0d1210;
+      --background-glow: #17251c;
+      --panel: #171e1a;
+      --panel-raised: #1c2520;
+      --panel-soft: #222d27;
+      --input: #111713;
+      --text: #eef6f0;
+      --muted: #9eada3;
+      --border: #334139;
+      --border-bright: #46584e;
+      --accent: #78c56f;
+      --accent-hover: #8dd684;
+      --accent-dark: #4d9d47;
+      --accent-text: #091109;
+      --danger: #eb827a;
+      --danger-soft: #3b2221;
+      --warning: #e6b75f;
+      --shadow: 0 16px 38px rgba(0, 0, 0, 0.32);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--background);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, var(--background-glow) 0, transparent 35rem),
+        radial-gradient(circle at bottom right, #111a15 0, transparent 40rem),
+        var(--background);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .page {
+      width: min(1200px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 28px 0 64px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0 0 7px;
+      font-size: clamp(1.9rem, 4vw, 2.8rem);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .save-indicator {
+      padding: 9px 13px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(23, 30, 26, 0.85);
+      color: var(--muted);
+      white-space: nowrap;
+      box-shadow: var(--shadow);
+    }
+
+    .save-indicator.saving {
+      color: var(--accent);
+      border-color: var(--accent-dark);
+    }
+
+    .toolbar,
+    .tabs,
+    .panel {
+      border: 1px solid var(--border);
+      background: rgba(23, 30, 26, 0.94);
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+    }
+
+    .button,
+    .toolbar button,
+    .transfer-button {
+      min-height: 42px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 10px 14px;
+      background: var(--accent);
+      color: var(--accent-text);
+      font-weight: 800;
+      transition:
+        background 120ms ease,
+        border-color 120ms ease,
+        transform 120ms ease;
+    }
+
+    .button:hover,
+    .toolbar button:hover,
+    .transfer-button:hover {
+      background: var(--accent-hover);
+    }
+
+    .button:active,
+    .toolbar button:active,
+    .transfer-button:active {
+      transform: translateY(1px);
+    }
+
+    .button.secondary,
+    .toolbar .secondary {
+      border-color: var(--border);
+      background: var(--panel-soft);
+      color: var(--text);
+    }
+
+    .button.secondary:hover,
+    .toolbar .secondary:hover {
+      border-color: var(--border-bright);
+      background: #2b3831;
+    }
+
+    .button.danger,
+    .toolbar .danger {
+      border-color: #63322f;
+      background: var(--danger-soft);
+      color: #ffaaa4;
+    }
+
+    .button.danger:hover,
+    .toolbar .danger:hover {
+      background: #4a2927;
+    }
+
+    .button.small {
+      min-height: 34px;
+      padding: 7px 10px;
+      font-size: 0.88rem;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    .tab-button {
+      flex: 1;
+      min-width: max-content;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 11px 16px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .tab-button:hover {
+      background: var(--panel-soft);
+      color: var(--text);
+    }
+
+    .tab-button.active {
+      background: var(--accent);
+      color: var(--accent-text);
+    }
+
+    .panel {
+      padding: 18px;
+      border-radius: 18px;
+      margin-bottom: 16px;
+    }
+
+    .panel h2 {
+      margin: 0 0 14px;
+      font-size: 1.25rem;
+      letter-spacing: -0.015em;
+    }
+
+    .empty-state {
+      padding: 26px 18px;
+      border: 1px dashed var(--border-bright);
+      border-radius: 14px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .totals-grid,
+    .account-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .totals-grid {
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    }
+
+    .total-card {
+      padding: 14px;
+      border-radius: 14px;
+      background: var(--panel-soft);
+      border: 1px solid var(--border);
+    }
+
+    .total-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      overflow-wrap: anywhere;
+    }
+
+    .total-number {
+      margin-top: 4px;
+      font-size: 1.7rem;
+      font-weight: 850;
+      color: var(--accent);
+    }
+
+    .account-grid {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .account-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--panel-raised);
+      overflow: hidden;
+    }
+
+    .account-card h3 {
+      margin: 0;
+      padding: 14px 16px;
+      background: var(--panel-soft);
+      border-bottom: 1px solid var(--border);
+      font-size: 1.05rem;
+      overflow-wrap: anywhere;
+    }
+
+    .material-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 11px 14px;
+      border-bottom: 1px solid #29342e;
+    }
+
+    .material-row:last-child {
+      border-bottom: 0;
+    }
+
+    .material-name {
+      font-weight: 680;
+      overflow-wrap: anywhere;
+    }
+
+    .counter {
+      display: grid;
+      grid-template-columns: 36px 70px 36px;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .counter button {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--input);
+      color: var(--text);
+      font-size: 1.2rem;
+      font-weight: 850;
+    }
+
+    .counter button:hover {
+      border-color: var(--accent-dark);
+      background: #223027;
+    }
+
+    .counter input,
+    input,
+    select {
+      border: 1px solid var(--border);
+      background: var(--input);
+      color: var(--text);
+    }
+
+    .counter input {
+      width: 70px;
+      height: 36px;
+      border-radius: 9px;
+      text-align: center;
+      font-weight: 800;
+    }
+
+    input::placeholder {
+      color: #748178;
+    }
+
+    .transfer-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(130px, 1fr));
+      gap: 10px;
+      align-items: end;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 750;
+    }
+
+    select,
+    .transfer-grid input,
+    .manager-form input,
+    .manager-form select,
+    .manager-row select {
+      width: 100%;
+      min-height: 42px;
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    select:hover,
+    input:hover {
+      border-color: var(--border-bright);
+    }
+
+    .transfer-message {
+      min-height: 24px;
+      margin: 12px 0 0;
+      color: var(--muted);
+    }
+
+    .transfer-message.success {
+      color: var(--accent);
+    }
+
+    .transfer-message.error {
+      color: var(--danger);
+    }
+
+    .overview-table-wrapper {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th,
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: right;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+      position: sticky;
+      left: 0;
+      background: var(--panel-raised);
+      z-index: 1;
+    }
+
+    thead th {
+      background: var(--panel-soft);
+      color: var(--muted);
+    }
+
+    thead th:first-child {
+      background: var(--panel-soft);
+      z-index: 2;
+    }
+
+    tbody tr:hover td {
+      background: #1d2822;
+    }
+
+    tbody tr:hover td:first-child {
+      background: #1d2822;
+    }
+
+    tfoot td {
+      font-weight: 850;
+      color: var(--accent);
+      background: #1d2822;
+      border-bottom: 0;
+    }
+
+    tfoot td:first-child {
+      background: #1d2822;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+      margin: 12px 0 0;
+    }
+
+    .disclaimer {
+      margin: 0 0 16px;
+      padding: 12px 14px;
+      border: 1px solid #4d5e54;
+      border-radius: 12px;
+      background: #202a24;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .disclaimer strong {
+      color: var(--text);
+    }
+
+    /* Management windows */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.68);
+      backdrop-filter: blur(6px);
+    }
+
+    .modal {
+      width: min(720px, 100%);
+      max-height: min(760px, calc(100vh - 36px));
+      overflow: auto;
+      border: 1px solid var(--border-bright);
+      border-radius: 18px;
+      background: var(--panel);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55);
+    }
+
+    .modal-header {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(23, 30, 26, 0.97);
+      backdrop-filter: blur(8px);
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .close-button {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--panel-soft);
+      color: var(--text);
+      font-size: 1.3rem;
+    }
+
+    .close-button:hover {
+      background: #2b3831;
+    }
+
+    .modal-body {
+      padding: 18px;
+    }
+
+    .manager-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: end;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel-soft);
+      margin-bottom: 16px;
+    }
+
+    .manager-form.material-form {
+      grid-template-columns: minmax(0, 1fr) minmax(150px, 0.45fr) auto;
+    }
+
+    .manager-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .manager-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel-raised);
+    }
+
+    .manager-name {
+      min-width: 0;
+      font-weight: 780;
+      overflow-wrap: anywhere;
+    }
+
+    .manager-subtitle {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .manager-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .manager-actions select {
+      width: auto;
+      min-width: 150px;
+      min-height: 34px;
+      padding-block: 5px;
+      font-size: 0.88rem;
+    }
+
+    .category-badge {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 3px 7px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 2000;
+      max-width: min(390px, calc(100% - 36px));
+      padding: 12px 15px;
+      border: 1px solid var(--border-bright);
+      border-radius: 12px;
+      background: #243129;
+      color: var(--text);
+      box-shadow: var(--shadow);
+      line-height: 1.45;
+    }
+
+    .toast.error {
+      border-color: #7d3f3a;
+      background: #3a2321;
+      color: #ffc0bb;
+    }
+
+    @media (max-width: 860px) {
+      .hero {
+        display: block;
+      }
+
+      .save-indicator {
+        display: inline-block;
+        margin-top: 12px;
+      }
+
+      .transfer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .transfer-button {
+        min-height: 42px;
+      }
+
+      .manager-form.material-form {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .manager-form.material-form .button {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 570px) {
+      .page {
+        width: min(100% - 16px, 1200px);
+        padding-top: 16px;
+      }
+
+      .panel {
+        padding: 12px;
+      }
+
+      .account-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .transfer-grid,
+      .manager-form,
+      .manager-form.material-form {
+        grid-template-columns: 1fr;
+      }
+
+      .manager-form.material-form .button {
+        grid-column: auto;
+      }
+
+      .manager-row {
+        grid-template-columns: 1fr;
+      }
+
+      .manager-actions {
+        justify-content: flex-start;
+      }
+
+      .manager-actions select {
+        flex: 1 1 100%;
+      }
+
+      .material-row {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="hero">
+      <div>
+        <h1>Hay Day Material Tracker</h1>
+        <p class="subtitle">Update your accounts, organize materials into categories, and let the tracker calculate every total.</p>
+      </div>
+      <div id="saveIndicator" class="save-indicator">Saved locally</div>
+    </header>
+
+    <section class="toolbar" aria-label="Tracker tools">
+      <button id="manageAccountsButton" type="button">Manage accounts</button>
+      <button id="manageMaterialsButton" type="button">Manage materials</button>
+      <button id="manageCategoriesButton" type="button">Manage categories</button>
+      <button id="exportButton" class="secondary" type="button">Export backup</button>
+      <button id="importButton" class="secondary" type="button">Import backup</button>
+      <button id="resetButton" class="danger" type="button">Reset all data</button>
+      <input id="importFile" class="hidden" type="file" accept=".json,application/json" />
+    </section>
+
+    <nav id="categoryTabs" class="tabs" aria-label="Material categories"></nav>
+    <div id="categorySections"></div>
+
+    <section id="overviewTab" class="tab-content hidden">
+      <section class="panel">
+        <h2>Everything at a glance</h2>
+        <div id="overviewTable" class="overview-table-wrapper"></div>
+      </section>
+    </section>
+
+    <section class="panel">
+      <h2>Transfer materials between accounts</h2>
+
+      <div class="transfer-grid">
+        <label>
+          From account
+          <select id="transferFrom"></select>
+        </label>
+
+        <label>
+          To account
+          <select id="transferTo"></select>
+        </label>
+
+        <label>
+          Material
+          <select id="transferMaterial"></select>
+        </label>
+
+        <label>
+          Amount
+          <input id="transferAmount" type="number" min="1" step="1" value="1" />
+        </label>
+
+        <button id="transferButton" class="transfer-button" type="button">Transfer</button>
+      </div>
+
+      <p id="transferMessage" class="transfer-message"></p>
+      <p class="note">
+        Everything saves automatically in this browser. Export an occasional backup so you can
+        restore the tracker after clearing browser data or moving to another computer.
+      </p>
+    </section>
+  </main>
+
+  <div id="modalBackdrop" class="modal-backdrop hidden">
+    <section id="accountsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="accountsModalTitle">
+      <header class="modal-header">
+        <h2 id="accountsModalTitle">Manage accounts</h2>
+        <button class="close-button" data-close-modal type="button" aria-label="Close">×</button>
+      </header>
+
+      <div class="modal-body">
+        <form id="addAccountForm" class="manager-form">
+          <label>
+            New account name
+            <input id="newAccountName" type="text" maxlength="60" placeholder="Example: Main Farm" autocomplete="off" />
+          </label>
+          <button class="button" type="submit">Add account</button>
+        </form>
+
+        <aside class="disclaimer" role="note">
+          <strong>Local tracker only.</strong> Accounts added here are not connected to,
+          authenticated with, or synchronized with Hay Day or Supercell in any way. They are
+          simply labels used to organize material quantities in this browser.
+        </aside>
+
+        <div id="accountManagerList" class="manager-list"></div>
+      </div>
+    </section>
+
+    <section id="materialsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="materialsModalTitle">
+      <header class="modal-header">
+        <h2 id="materialsModalTitle">Manage materials</h2>
+        <button class="close-button" data-close-modal type="button" aria-label="Close">×</button>
+      </header>
+
+      <div class="modal-body">
+        <form id="addMaterialForm" class="manager-form material-form">
+          <label>
+            New material name
+            <input id="newMaterialName" type="text" maxlength="60" placeholder="Example: Mallet" autocomplete="off" />
+          </label>
+
+          <label>
+            Category
+            <select id="newMaterialCategory"></select>
+          </label>
+
+          <button class="button" type="submit">Add material</button>
+        </form>
+
+        <div id="materialManagerList" class="manager-list"></div>
+      </div>
+    </section>
+
+    <section id="categoriesModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="categoriesModalTitle">
+      <header class="modal-header">
+        <h2 id="categoriesModalTitle">Manage categories</h2>
+        <button class="close-button" data-close-modal type="button" aria-label="Close">×</button>
+      </header>
+
+      <div class="modal-body">
+        <form id="addCategoryForm" class="manager-form">
+          <label>
+            New category name
+            <input id="newCategoryName" type="text" maxlength="60" placeholder="Example: Land Expansion" autocomplete="off" />
+          </label>
+          <button class="button" type="submit">Add category</button>
+        </form>
+
+        <p class="note">
+          When a category containing materials is removed, its materials are moved to the destination you choose. Quantities are never deleted.
+        </p>
+
+        <div id="categoryManagerList" class="manager-list"></div>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script>
+    // Public starter data: default materials, no user accounts.
+    const INITIAL_DATA = {
+      version: 3,
+
+      categoryOrder: ["category_upgrades", "category_tools"],
+
+      categories: {
+        "category_upgrades": {
+          name: "Upgrade Materials",
+          materials: ["Bolt", "Plank", "Duct Tape", "Nail", "Screw", "Wood Panel"]
+        },
+        "category_tools": {
+          name: "Tools",
+          materials: ["Saw", "Axe", "TNT Barrel", "Dynamite", "Shovel"]
+        }
+      },
+
+      accounts: {}
+    };
+
+    // Keep this key stable for existing local data and older backups.
+    const STORAGE_KEY = "hayDayMaterialTrackerDataV1";
+    const FORBIDDEN_NAMES = new Set(["__proto__", "prototype", "constructor"]);
+    const OVERVIEW_TAB = "__overview__";
+
+    function cloneData(data) {
+      return JSON.parse(JSON.stringify(data));
+    }
+
+    function cleanWholeNumber(value) {
+      return Math.max(0, Math.floor(Number(value) || 0));
+    }
+
+    function normalizedName(name) {
+      return String(name).trim().toLocaleLowerCase();
+    }
+
+    function uniqueNames(names) {
+      const seen = new Set();
+      const result = [];
+
+      names.forEach(name => {
+        if (typeof name !== "string") {
+          return;
+        }
+
+        const trimmed = name.trim();
+        const key = normalizedName(trimmed);
+
+        if (!trimmed || seen.has(key) || FORBIDDEN_NAMES.has(key)) {
+          return;
+        }
+
+        seen.add(key);
+        result.push(trimmed);
+      });
+
+      return result;
+    }
+
+    function makeCategoryId() {
+      let id;
+
+      do {
+        id = `category_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+      } while (trackerData?.categories && Object.hasOwn(trackerData.categories, id));
+
+      return id;
+    }
+
+    function safeCategoryId(rawId, index) {
+      const candidate = String(rawId ?? "").trim();
+      const key = normalizedName(candidate);
+
+      if (
+        candidate &&
+        !FORBIDDEN_NAMES.has(key) &&
+        /^[A-Za-z0-9_-]+$/.test(candidate)
+      ) {
+        return candidate;
+      }
+
+      return `category_imported_${index + 1}`;
+    }
+
+    // Upgrade older saved formats to the current structure.
+    function normalizeData(rawData) {
+      const raw = rawData && typeof rawData === "object" ? rawData : {};
+      const normalized = {
+        version: 3,
+        categoryOrder: [],
+        categories: {},
+        accounts: {}
+      };
+
+      // Current category format.
+      if (
+        raw.categories &&
+        typeof raw.categories === "object" &&
+        !Array.isArray(raw.categories) &&
+        Object.values(raw.categories).some(category => {
+          return category && typeof category === "object" && Array.isArray(category.materials);
+        })
+      ) {
+        const requestedOrder = Array.isArray(raw.categoryOrder)
+          ? raw.categoryOrder
+          : Object.keys(raw.categories);
+
+        const orderedIds = [
+          ...requestedOrder,
+          ...Object.keys(raw.categories).filter(id => !requestedOrder.includes(id))
+        ];
+
+        orderedIds.forEach((rawId, index) => {
+          const rawCategory = raw.categories[rawId];
+
+          if (!rawCategory || typeof rawCategory !== "object") {
+            return;
+          }
+
+          let categoryId = safeCategoryId(rawId, index);
+          while (Object.hasOwn(normalized.categories, categoryId)) {
+            categoryId = `${categoryId}_${index + 1}`;
+          }
+
+          const fallbackName = `Category ${normalized.categoryOrder.length + 1}`;
+          const categoryName = String(rawCategory.name ?? fallbackName).trim() || fallbackName;
+
+          normalized.categories[categoryId] = {
+            name: categoryName,
+            materials: uniqueNames(Array.isArray(rawCategory.materials) ? rawCategory.materials : [])
+          };
+          normalized.categoryOrder.push(categoryId);
+        });
+      } else if (raw.categories && typeof raw.categories === "object") {
+        // Older named-array category format.
+        const oldCategories = Object.entries(raw.categories).filter(([, materials]) => {
+          return Array.isArray(materials);
+        });
+
+        oldCategories.forEach(([oldKey, materials], index) => {
+          let categoryId = safeCategoryId(`category_${oldKey}`, index);
+          while (Object.hasOwn(normalized.categories, categoryId)) {
+            categoryId = `${categoryId}_${index + 1}`;
+          }
+
+          let categoryName = oldKey;
+          if (oldKey === "upgrades") categoryName = "Upgrade Materials";
+          if (oldKey === "tools") categoryName = "Tools";
+
+          normalized.categories[categoryId] = {
+            name: categoryName,
+            materials: uniqueNames(materials)
+          };
+          normalized.categoryOrder.push(categoryId);
+        });
+      }
+
+      // Use the defaults when no categories were stored.
+      if (normalized.categoryOrder.length === 0) {
+        const defaults = cloneData(INITIAL_DATA);
+        normalized.categories = defaults.categories;
+        normalized.categoryOrder = defaults.categoryOrder;
+      }
+
+      // Repair empty or duplicate category names.
+      const usedCategoryNames = new Set();
+      normalized.categoryOrder.forEach((categoryId, index) => {
+        const category = normalized.categories[categoryId];
+        let name = String(category.name ?? "").trim() || `Category ${index + 1}`;
+        let candidate = name;
+        let suffix = 2;
+
+        while (usedCategoryNames.has(normalizedName(candidate))) {
+          candidate = `${name} ${suffix}`;
+          suffix += 1;
+        }
+
+        category.name = candidate;
+        usedCategoryNames.add(normalizedName(candidate));
+      });
+
+      // Keep each material in one category.
+      const listedMaterials = new Set();
+      normalized.categoryOrder.forEach(categoryId => {
+        normalized.categories[categoryId].materials =
+          normalized.categories[categoryId].materials.filter(materialName => {
+            const key = normalizedName(materialName);
+
+            if (listedMaterials.has(key)) {
+              return false;
+            }
+
+            listedMaterials.add(key);
+            return true;
+          });
+      });
+
+      if (raw.accounts && typeof raw.accounts === "object" && !Array.isArray(raw.accounts)) {
+        Object.entries(raw.accounts).forEach(([rawAccountName, rawAmounts]) => {
+          const accountName = String(rawAccountName).trim();
+          const accountKey = normalizedName(accountName);
+
+          if (
+            !accountName ||
+            FORBIDDEN_NAMES.has(accountKey) ||
+            !rawAmounts ||
+            typeof rawAmounts !== "object" ||
+            Array.isArray(rawAmounts)
+          ) {
+            return;
+          }
+
+          const cleanedAmounts = {};
+
+          Object.entries(rawAmounts).forEach(([rawMaterialName, amount]) => {
+            const materialName = String(rawMaterialName).trim();
+            const materialKey = normalizedName(materialName);
+
+            if (!materialName || FORBIDDEN_NAMES.has(materialKey)) {
+              return;
+            }
+
+            cleanedAmounts[materialName] = cleanWholeNumber(amount);
+          });
+
+          normalized.accounts[accountName] = cleanedAmounts;
+        });
+      }
+
+      // Preserve unlisted materials by assigning them to the first category.
+      const fallbackCategoryId = normalized.categoryOrder[0];
+      const fallbackCategory = normalized.categories[fallbackCategoryId];
+
+      Object.values(normalized.accounts).forEach(amounts => {
+        Object.keys(amounts).forEach(materialName => {
+          const key = normalizedName(materialName);
+
+          if (!listedMaterials.has(key)) {
+            fallbackCategory.materials.push(materialName);
+            listedMaterials.add(key);
+          }
+        });
+      });
+
+      return normalized;
+    }
+
+    function loadData() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+
+      if (!saved) {
+        return cloneData(INITIAL_DATA);
+      }
+
+      try {
+        return normalizeData(JSON.parse(saved));
+      } catch (error) {
+        console.error("Saved data could not be read:", error);
+        return cloneData(INITIAL_DATA);
+      }
+    }
+
+    let trackerData = loadData();
+    let activeModalId = null;
+    let activeTab = trackerData.categoryOrder[0] ?? OVERVIEW_TAB;
+
+    // Saving and general helpers
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(trackerData));
+
+      const indicator = document.getElementById("saveIndicator");
+      indicator.textContent = "Saved just now";
+      indicator.classList.add("saving");
+
+      clearTimeout(saveData.indicatorTimer);
+      saveData.indicatorTimer = setTimeout(() => {
+        indicator.textContent = "Saved locally";
+        indicator.classList.remove("saving");
+      }, 1200);
+    }
+
+    function showToast(message, isError = false) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.toggle("error", isError);
+      toast.classList.remove("hidden");
+
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => {
+        toast.classList.add("hidden");
+      }, 3200);
+    }
+
+    function validateNewName(name, existingNames, typeLabel, originalName = null) {
+      const trimmed = String(name).trim();
+      const key = normalizedName(trimmed);
+
+      if (!trimmed) {
+        return `${typeLabel} name cannot be empty.`;
+      }
+
+      if (FORBIDDEN_NAMES.has(key)) {
+        return `Please choose a different ${typeLabel.toLowerCase()} name.`;
+      }
+
+      const originalKey = originalName === null ? null : normalizedName(originalName);
+      const duplicate = existingNames.some(existingName => {
+        const existingKey = normalizedName(existingName);
+        return existingKey === key && existingKey !== originalKey;
+      });
+
+      if (duplicate) {
+        return `A ${typeLabel.toLowerCase()} with that name already exists.`;
+      }
+
+      return null;
+    }
+
+    function getAccountNames() {
+      return Object.keys(trackerData.accounts);
+    }
+
+    function getCategoryIds() {
+      return trackerData.categoryOrder.filter(categoryId => {
+        return Object.hasOwn(trackerData.categories, categoryId);
+      });
+    }
+
+    function getCategoryName(categoryId) {
+      return trackerData.categories[categoryId]?.name ?? "Unknown Category";
+    }
+
+    function getAllMaterials() {
+      return getCategoryIds().flatMap(categoryId => {
+        return trackerData.categories[categoryId].materials;
+      });
+    }
+
+    function getMaterialCategoryId(materialName) {
+      return getCategoryIds().find(categoryId => {
+        return trackerData.categories[categoryId].materials.includes(materialName);
+      }) ?? null;
+    }
+
+    function getAmount(accountName, materialName) {
+      const account = trackerData.accounts[accountName];
+
+      if (!account) {
+        return 0;
+      }
+
+      return cleanWholeNumber(account[materialName]);
+    }
+
+    function setAmount(accountName, materialName, newAmount) {
+      if (!trackerData.accounts[accountName]) {
+        return;
+      }
+
+      trackerData.accounts[accountName][materialName] = cleanWholeNumber(newAmount);
+      saveData();
+      renderEverything();
+    }
+
+    function getTotal(materialName) {
+      return getAccountNames().reduce((sum, accountName) => {
+        return sum + getAmount(accountName, materialName);
+      }, 0);
+    }
+
+    function createEmptyState(message) {
+      const element = document.createElement("div");
+      element.className = "empty-state";
+      element.textContent = message;
+      return element;
+    }
+
+    // Main tracker rendering
+    function renderTotals(container, materials) {
+      container.innerHTML = "";
+
+      if (materials.length === 0) {
+        container.appendChild(
+          createEmptyState("No materials are in this category yet. Use Manage materials to add one.")
+        );
+        return;
+      }
+
+      materials.forEach(materialName => {
+        const card = document.createElement("div");
+        card.className = "total-card";
+
+        const label = document.createElement("div");
+        label.className = "total-label";
+        label.textContent = materialName;
+
+        const number = document.createElement("div");
+        number.className = "total-number";
+        number.textContent = getTotal(materialName);
+
+        card.append(label, number);
+        container.appendChild(card);
+      });
+    }
+
+    function createMaterialRow(accountName, materialName) {
+      const row = document.createElement("div");
+      row.className = "material-row";
+
+      const name = document.createElement("div");
+      name.className = "material-name";
+      name.textContent = materialName;
+
+      const counter = document.createElement("div");
+      counter.className = "counter";
+
+      const minusButton = document.createElement("button");
+      minusButton.type = "button";
+      minusButton.textContent = "−";
+      minusButton.title = `Remove one ${materialName}`;
+      minusButton.addEventListener("click", () => {
+        setAmount(accountName, materialName, getAmount(accountName, materialName) - 1);
+      });
+
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = "0";
+      input.step = "1";
+      input.value = getAmount(accountName, materialName);
+      input.setAttribute("aria-label", `${materialName} on ${accountName}`);
+      input.addEventListener("change", () => {
+        setAmount(accountName, materialName, input.value);
+      });
+
+      const plusButton = document.createElement("button");
+      plusButton.type = "button";
+      plusButton.textContent = "+";
+      plusButton.title = `Add one ${materialName}`;
+      plusButton.addEventListener("click", () => {
+        setAmount(accountName, materialName, getAmount(accountName, materialName) + 1);
+      });
+
+      counter.append(minusButton, input, plusButton);
+      row.append(name, counter);
+
+      return row;
+    }
+
+    function renderAccounts(container, materials) {
+      container.innerHTML = "";
+      const accountNames = getAccountNames();
+
+      if (accountNames.length === 0) {
+        container.appendChild(
+          createEmptyState("No accounts exist yet. Use Manage accounts to add your first account.")
+        );
+        return;
+      }
+
+      if (materials.length === 0) {
+        container.appendChild(createEmptyState("There are no materials in this category."));
+        return;
+      }
+
+      accountNames.forEach(accountName => {
+        const card = document.createElement("article");
+        card.className = "account-card";
+
+        const heading = document.createElement("h3");
+        heading.textContent = accountName;
+        card.appendChild(heading);
+
+        materials.forEach(materialName => {
+          card.appendChild(createMaterialRow(accountName, materialName));
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    function renderCategoryTabsAndSections() {
+      const tabsContainer = document.getElementById("categoryTabs");
+      const sectionsContainer = document.getElementById("categorySections");
+      const categoryIds = getCategoryIds();
+
+      if (activeTab !== OVERVIEW_TAB && !categoryIds.includes(activeTab)) {
+        activeTab = categoryIds[0] ?? OVERVIEW_TAB;
+      }
+
+      tabsContainer.innerHTML = "";
+      sectionsContainer.innerHTML = "";
+
+      categoryIds.forEach(categoryId => {
+        const category = trackerData.categories[categoryId];
+
+        const tabButton = document.createElement("button");
+        tabButton.type = "button";
+        tabButton.className = "tab-button";
+        tabButton.dataset.tab = categoryId;
+        tabButton.textContent = category.name;
+        tabButton.classList.toggle("active", activeTab === categoryId);
+        tabButton.addEventListener("click", () => showTab(categoryId));
+        tabsContainer.appendChild(tabButton);
+
+        const section = document.createElement("section");
+        section.className = "tab-content";
+        section.dataset.categorySection = categoryId;
+        section.classList.toggle("hidden", activeTab !== categoryId);
+
+        const totalsPanel = document.createElement("section");
+        totalsPanel.className = "panel";
+
+        const totalsHeading = document.createElement("h2");
+        totalsHeading.textContent = `${category.name} totals`;
+
+        const totalsGrid = document.createElement("div");
+        totalsGrid.className = "totals-grid";
+        renderTotals(totalsGrid, category.materials);
+
+        totalsPanel.append(totalsHeading, totalsGrid);
+
+        const accountsPanel = document.createElement("section");
+        accountsPanel.className = "panel";
+
+        const accountsHeading = document.createElement("h2");
+        accountsHeading.textContent = "Accounts";
+
+        const accountsGrid = document.createElement("div");
+        accountsGrid.className = "account-grid";
+        renderAccounts(accountsGrid, category.materials);
+
+        accountsPanel.append(accountsHeading, accountsGrid);
+        section.append(totalsPanel, accountsPanel);
+        sectionsContainer.appendChild(section);
+      });
+
+      const overviewButton = document.createElement("button");
+      overviewButton.type = "button";
+      overviewButton.className = "tab-button";
+      overviewButton.dataset.tab = OVERVIEW_TAB;
+      overviewButton.textContent = "Full Overview";
+      overviewButton.classList.toggle("active", activeTab === OVERVIEW_TAB);
+      overviewButton.addEventListener("click", () => showTab(OVERVIEW_TAB));
+      tabsContainer.appendChild(overviewButton);
+
+      document.getElementById("overviewTab").classList.toggle(
+        "hidden",
+        activeTab !== OVERVIEW_TAB
+      );
+    }
+
+    function renderOverview() {
+      const container = document.getElementById("overviewTable");
+      const materials = getAllMaterials();
+      const accountNames = getAccountNames();
+
+      container.innerHTML = "";
+
+      if (materials.length === 0 || accountNames.length === 0) {
+        container.appendChild(
+          createEmptyState("Add at least one account and one material to build the overview.")
+        );
+        return;
+      }
+
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+
+      const accountHeader = document.createElement("th");
+      accountHeader.textContent = "Account";
+      headerRow.appendChild(accountHeader);
+
+      materials.forEach(materialName => {
+        const th = document.createElement("th");
+        th.textContent = materialName;
+        headerRow.appendChild(th);
+      });
+
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+
+      accountNames.forEach(accountName => {
+        const row = document.createElement("tr");
+
+        const nameCell = document.createElement("td");
+        nameCell.textContent = accountName;
+        row.appendChild(nameCell);
+
+        materials.forEach(materialName => {
+          const cell = document.createElement("td");
+          cell.textContent = getAmount(accountName, materialName);
+          row.appendChild(cell);
+        });
+
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(tbody);
+
+      const tfoot = document.createElement("tfoot");
+      const totalRow = document.createElement("tr");
+
+      const totalLabel = document.createElement("td");
+      totalLabel.textContent = "Total";
+      totalRow.appendChild(totalLabel);
+
+      materials.forEach(materialName => {
+        const cell = document.createElement("td");
+        cell.textContent = getTotal(materialName);
+        totalRow.appendChild(cell);
+      });
+
+      tfoot.appendChild(totalRow);
+      table.appendChild(tfoot);
+      container.appendChild(table);
+    }
+
+    function renderEverything() {
+      renderCategoryTabsAndSections();
+      renderOverview();
+      populateTransferMenus();
+      populateNewMaterialCategoryMenu();
+      renderAccountManager();
+      renderMaterialManager();
+      renderCategoryManager();
+    }
+
+    function showTab(tabId) {
+      if (tabId !== OVERVIEW_TAB && !Object.hasOwn(trackerData.categories, tabId)) {
+        return;
+      }
+
+      activeTab = tabId;
+      renderCategoryTabsAndSections();
+    }
+
+    // Account management
+    function addAccount(accountName) {
+      const error = validateNewName(accountName, getAccountNames(), "Account");
+
+      if (error) {
+        showToast(error, true);
+        return false;
+      }
+
+      const trimmedName = accountName.trim();
+      const amounts = {};
+
+      getAllMaterials().forEach(materialName => {
+        amounts[materialName] = 0;
+      });
+
+      trackerData.accounts[trimmedName] = amounts;
+      saveData();
+      renderEverything();
+      showToast(`${trimmedName} was added.`);
+      return true;
+    }
+
+    function renameAccount(oldName) {
+      const requestedName = prompt(`Rename "${oldName}" to:`, oldName);
+
+      if (requestedName === null) {
+        return;
+      }
+
+      const error = validateNewName(requestedName, getAccountNames(), "Account", oldName);
+
+      if (error) {
+        showToast(error, true);
+        return;
+      }
+
+      const newName = requestedName.trim();
+
+      if (newName === oldName) {
+        return;
+      }
+
+      const updatedAccounts = {};
+
+      Object.entries(trackerData.accounts).forEach(([accountName, amounts]) => {
+        updatedAccounts[accountName === oldName ? newName : accountName] = amounts;
+      });
+
+      trackerData.accounts = updatedAccounts;
+      saveData();
+      renderEverything();
+      showToast(`Renamed ${oldName} to ${newName}.`);
+    }
+
+    function deleteAccount(accountName) {
+      const confirmed = confirm(
+        `Delete "${accountName}"?\n\nAll material quantities stored on this account will be removed.`
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      delete trackerData.accounts[accountName];
+      saveData();
+      renderEverything();
+      showToast(`${accountName} was deleted.`);
+    }
+
+    function renderAccountManager() {
+      const container = document.getElementById("accountManagerList");
+      container.innerHTML = "";
+      const accountNames = getAccountNames();
+
+      if (accountNames.length === 0) {
+        container.appendChild(createEmptyState("No accounts have been added."));
+        return;
+      }
+
+      accountNames.forEach(accountName => {
+        const row = document.createElement("div");
+        row.className = "manager-row";
+
+        const information = document.createElement("div");
+        const name = document.createElement("div");
+        name.className = "manager-name";
+        name.textContent = accountName;
+
+        const subtitle = document.createElement("div");
+        subtitle.className = "manager-subtitle";
+        subtitle.textContent = `${getAllMaterials().length} tracked materials`;
+        information.append(name, subtitle);
+
+        const actions = document.createElement("div");
+        actions.className = "manager-actions";
+
+        const renameButton = document.createElement("button");
+        renameButton.type = "button";
+        renameButton.className = "button secondary small";
+        renameButton.textContent = "Rename";
+        renameButton.addEventListener("click", () => renameAccount(accountName));
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "button danger small";
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", () => deleteAccount(accountName));
+
+        actions.append(renameButton, deleteButton);
+        row.append(information, actions);
+        container.appendChild(row);
+      });
+    }
+
+    document.getElementById("addAccountForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const input = document.getElementById("newAccountName");
+
+      if (addAccount(input.value)) {
+        input.value = "";
+        input.focus();
+      }
+    });
+
+    // Category management
+    function getCategoryNames() {
+      return getCategoryIds().map(getCategoryName);
+    }
+
+    function addCategory(categoryName) {
+      const error = validateNewName(categoryName, getCategoryNames(), "Category");
+
+      if (error) {
+        showToast(error, true);
+        return false;
+      }
+
+      const categoryId = makeCategoryId();
+      const trimmedName = categoryName.trim();
+
+      trackerData.categories[categoryId] = {
+        name: trimmedName,
+        materials: []
+      };
+      trackerData.categoryOrder.push(categoryId);
+
+      activeTab = categoryId;
+      saveData();
+      renderEverything();
+      showToast(`${trimmedName} was added.`);
+      return true;
+    }
+
+    function renameCategory(categoryId) {
+      const category = trackerData.categories[categoryId];
+
+      if (!category) {
+        return;
+      }
+
+      const requestedName = prompt(`Rename "${category.name}" to:`, category.name);
+
+      if (requestedName === null) {
+        return;
+      }
+
+      const error = validateNewName(
+        requestedName,
+        getCategoryNames(),
+        "Category",
+        category.name
+      );
+
+      if (error) {
+        showToast(error, true);
+        return;
+      }
+
+      const newName = requestedName.trim();
+
+      if (newName === category.name) {
+        return;
+      }
+
+      const oldName = category.name;
+      category.name = newName;
+      saveData();
+      renderEverything();
+      showToast(`Renamed ${oldName} to ${newName}.`);
+    }
+
+    function deleteCategory(categoryId, destinationId) {
+      const categoryIds = getCategoryIds();
+      const category = trackerData.categories[categoryId];
+
+      if (!category) {
+        return;
+      }
+
+      if (categoryIds.length <= 1) {
+        showToast("The last remaining category cannot be deleted.", true);
+        return;
+      }
+
+      const materials = [...category.materials];
+
+      if (materials.length > 0) {
+        if (
+          !destinationId ||
+          destinationId === categoryId ||
+          !Object.hasOwn(trackerData.categories, destinationId)
+        ) {
+          showToast("Choose another category to receive the materials first.", true);
+          return;
+        }
+      }
+
+      const destinationName = materials.length > 0
+        ? getCategoryName(destinationId)
+        : null;
+
+      const message = materials.length > 0
+        ? `Delete "${category.name}"?\n\nIts ${materials.length} material${materials.length === 1 ? "" : "s"} will be moved to "${destinationName}". All account quantities will be preserved.`
+        : `Delete the empty category "${category.name}"?`;
+
+      if (!confirm(message)) {
+        return;
+      }
+
+      if (materials.length > 0) {
+        trackerData.categories[destinationId].materials.push(...materials);
+      }
+
+      delete trackerData.categories[categoryId];
+      trackerData.categoryOrder = trackerData.categoryOrder.filter(id => id !== categoryId);
+
+      if (activeTab === categoryId) {
+        activeTab = materials.length > 0
+          ? destinationId
+          : trackerData.categoryOrder[0];
+      }
+
+      saveData();
+      renderEverything();
+
+      if (materials.length > 0) {
+        showToast(`${category.name} was deleted. Its materials were moved to ${destinationName}.`);
+      } else {
+        showToast(`${category.name} was deleted.`);
+      }
+    }
+
+    function moveCategory(categoryId, direction) {
+      const index = trackerData.categoryOrder.indexOf(categoryId);
+      const targetIndex = index + direction;
+
+      if (index < 0 || targetIndex < 0 || targetIndex >= trackerData.categoryOrder.length) {
+        return;
+      }
+
+      [trackerData.categoryOrder[index], trackerData.categoryOrder[targetIndex]] =
+        [trackerData.categoryOrder[targetIndex], trackerData.categoryOrder[index]];
+
+      saveData();
+      renderEverything();
+    }
+
+    function renderCategoryManager() {
+      const container = document.getElementById("categoryManagerList");
+      container.innerHTML = "";
+      const categoryIds = getCategoryIds();
+
+      categoryIds.forEach((categoryId, index) => {
+        const category = trackerData.categories[categoryId];
+        const otherCategoryIds = categoryIds.filter(id => id !== categoryId);
+
+        const row = document.createElement("div");
+        row.className = "manager-row";
+
+        const information = document.createElement("div");
+        const name = document.createElement("div");
+        name.className = "manager-name";
+        name.textContent = category.name;
+
+        const subtitle = document.createElement("div");
+        subtitle.className = "manager-subtitle";
+        subtitle.textContent = `${category.materials.length} material${category.materials.length === 1 ? "" : "s"}`;
+        information.append(name, subtitle);
+
+        const actions = document.createElement("div");
+        actions.className = "manager-actions";
+
+        const upButton = document.createElement("button");
+        upButton.type = "button";
+        upButton.className = "button secondary small";
+        upButton.textContent = "↑";
+        upButton.title = "Move category left";
+        upButton.disabled = index === 0;
+        upButton.addEventListener("click", () => moveCategory(categoryId, -1));
+
+        const downButton = document.createElement("button");
+        downButton.type = "button";
+        downButton.className = "button secondary small";
+        downButton.textContent = "↓";
+        downButton.title = "Move category right";
+        downButton.disabled = index === categoryIds.length - 1;
+        downButton.addEventListener("click", () => moveCategory(categoryId, 1));
+
+        const renameButton = document.createElement("button");
+        renameButton.type = "button";
+        renameButton.className = "button secondary small";
+        renameButton.textContent = "Rename";
+        renameButton.addEventListener("click", () => renameCategory(categoryId));
+
+        let destinationSelect = null;
+
+        if (category.materials.length > 0 && otherCategoryIds.length > 0) {
+          destinationSelect = document.createElement("select");
+          destinationSelect.setAttribute(
+            "aria-label",
+            `Move ${category.name} materials here if deleted`
+          );
+          destinationSelect.title = "Destination used if this category is deleted";
+
+          otherCategoryIds.forEach(otherId => {
+            const option = document.createElement("option");
+            option.value = otherId;
+            option.textContent = `On delete → ${getCategoryName(otherId)}`;
+            destinationSelect.appendChild(option);
+          });
+        }
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "button danger small";
+        deleteButton.textContent = "Delete";
+        deleteButton.disabled = categoryIds.length <= 1;
+        deleteButton.title = categoryIds.length <= 1
+          ? "The last category cannot be deleted"
+          : "Delete this category";
+        deleteButton.addEventListener("click", () => {
+          deleteCategory(categoryId, destinationSelect?.value ?? null);
+        });
+
+        actions.append(upButton, downButton, renameButton);
+        if (destinationSelect) actions.appendChild(destinationSelect);
+        actions.appendChild(deleteButton);
+
+        row.append(information, actions);
+        container.appendChild(row);
+      });
+    }
+
+    document.getElementById("addCategoryForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const input = document.getElementById("newCategoryName");
+
+      if (addCategory(input.value)) {
+        input.value = "";
+        input.focus();
+      }
+    });
+
+    // Material management
+    function populateNewMaterialCategoryMenu() {
+      const select = document.getElementById("newMaterialCategory");
+      const previousValue = select.value;
+      select.innerHTML = "";
+
+      getCategoryIds().forEach(categoryId => {
+        const option = document.createElement("option");
+        option.value = categoryId;
+        option.textContent = getCategoryName(categoryId);
+        select.appendChild(option);
+      });
+
+      if (Object.hasOwn(trackerData.categories, previousValue)) {
+        select.value = previousValue;
+      }
+    }
+
+    function addMaterial(materialName, categoryId) {
+      const error = validateNewName(materialName, getAllMaterials(), "Material");
+
+      if (error) {
+        showToast(error, true);
+        return false;
+      }
+
+      if (!Object.hasOwn(trackerData.categories, categoryId)) {
+        showToast("Choose a valid material category.", true);
+        return false;
+      }
+
+      const trimmedName = materialName.trim();
+      trackerData.categories[categoryId].materials.push(trimmedName);
+
+      Object.values(trackerData.accounts).forEach(amounts => {
+        amounts[trimmedName] = 0;
+      });
+
+      saveData();
+      renderEverything();
+      showToast(`${trimmedName} was added to ${getCategoryName(categoryId)}.`);
+      return true;
+    }
+
+    function renameMaterial(oldName) {
+      const requestedName = prompt(`Rename "${oldName}" to:`, oldName);
+
+      if (requestedName === null) {
+        return;
+      }
+
+      const error = validateNewName(requestedName, getAllMaterials(), "Material", oldName);
+
+      if (error) {
+        showToast(error, true);
+        return;
+      }
+
+      const newName = requestedName.trim();
+
+      if (newName === oldName) {
+        return;
+      }
+
+      getCategoryIds().forEach(categoryId => {
+        trackerData.categories[categoryId].materials =
+          trackerData.categories[categoryId].materials.map(materialName => {
+            return materialName === oldName ? newName : materialName;
+          });
+      });
+
+      Object.values(trackerData.accounts).forEach(amounts => {
+        const oldAmount = cleanWholeNumber(amounts[oldName]);
+        delete amounts[oldName];
+        amounts[newName] = oldAmount;
+      });
+
+      saveData();
+      renderEverything();
+      showToast(`Renamed ${oldName} to ${newName}.`);
+    }
+
+    function moveMaterial(materialName, newCategoryId) {
+      const currentCategoryId = getMaterialCategoryId(materialName);
+
+      if (currentCategoryId === newCategoryId) {
+        return;
+      }
+
+      if (!currentCategoryId || !Object.hasOwn(trackerData.categories, newCategoryId)) {
+        return;
+      }
+
+      trackerData.categories[currentCategoryId].materials =
+        trackerData.categories[currentCategoryId].materials.filter(name => name !== materialName);
+
+      trackerData.categories[newCategoryId].materials.push(materialName);
+
+      saveData();
+      renderEverything();
+      showToast(`${materialName} moved to ${getCategoryName(newCategoryId)}.`);
+    }
+
+    function deleteMaterial(materialName) {
+      const total = getTotal(materialName);
+      const confirmed = confirm(
+        `Delete "${materialName}"?\n\nIts combined quantity is ${total}. This removes it from every account.`
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      getCategoryIds().forEach(categoryId => {
+        trackerData.categories[categoryId].materials =
+          trackerData.categories[categoryId].materials.filter(name => name !== materialName);
+      });
+
+      Object.values(trackerData.accounts).forEach(amounts => {
+        delete amounts[materialName];
+      });
+
+      saveData();
+      renderEverything();
+      showToast(`${materialName} was deleted.`);
+    }
+
+    function renderMaterialManager() {
+      const container = document.getElementById("materialManagerList");
+      container.innerHTML = "";
+      const materials = getAllMaterials();
+
+      if (materials.length === 0) {
+        container.appendChild(createEmptyState("No materials have been added."));
+        return;
+      }
+
+      materials.forEach(materialName => {
+        const categoryId = getMaterialCategoryId(materialName);
+        const row = document.createElement("div");
+        row.className = "manager-row";
+
+        const information = document.createElement("div");
+        const name = document.createElement("div");
+        name.className = "manager-name";
+        name.textContent = materialName;
+
+        const badge = document.createElement("span");
+        badge.className = "category-badge";
+        badge.textContent = `${getCategoryName(categoryId)} · Total ${getTotal(materialName)}`;
+        information.append(name, badge);
+
+        const actions = document.createElement("div");
+        actions.className = "manager-actions";
+
+        const categorySelect = document.createElement("select");
+        categorySelect.setAttribute("aria-label", `Category for ${materialName}`);
+
+        getCategoryIds().forEach(optionCategoryId => {
+          const option = document.createElement("option");
+          option.value = optionCategoryId;
+          option.textContent = getCategoryName(optionCategoryId);
+          option.selected = optionCategoryId === categoryId;
+          categorySelect.appendChild(option);
+        });
+
+        categorySelect.addEventListener("change", () => {
+          moveMaterial(materialName, categorySelect.value);
+        });
+
+        const renameButton = document.createElement("button");
+        renameButton.type = "button";
+        renameButton.className = "button secondary small";
+        renameButton.textContent = "Rename";
+        renameButton.addEventListener("click", () => renameMaterial(materialName));
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "button danger small";
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", () => deleteMaterial(materialName));
+
+        actions.append(categorySelect, renameButton, deleteButton);
+        row.append(information, actions);
+        container.appendChild(row);
+      });
+    }
+
+    document.getElementById("addMaterialForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const nameInput = document.getElementById("newMaterialName");
+      const categorySelect = document.getElementById("newMaterialCategory");
+
+      if (addMaterial(nameInput.value, categorySelect.value)) {
+        nameInput.value = "";
+        nameInput.focus();
+      }
+    });
+
+    // Modals
+    function openModal(modalId) {
+      const backdrop = document.getElementById("modalBackdrop");
+      const modal = document.getElementById(modalId);
+
+      document.querySelectorAll(".modal").forEach(element => {
+        element.classList.add("hidden");
+      });
+
+      modal.classList.remove("hidden");
+      backdrop.classList.remove("hidden");
+      activeModalId = modalId;
+
+      const firstInput = modal.querySelector("input");
+      setTimeout(() => firstInput?.focus(), 0);
+    }
+
+    function closeModal() {
+      document.getElementById("modalBackdrop").classList.add("hidden");
+
+      document.querySelectorAll(".modal").forEach(element => {
+        element.classList.add("hidden");
+      });
+
+      activeModalId = null;
+    }
+
+    document.getElementById("manageAccountsButton").addEventListener("click", () => {
+      openModal("accountsModal");
+    });
+
+    document.getElementById("manageMaterialsButton").addEventListener("click", () => {
+      openModal("materialsModal");
+    });
+
+    document.getElementById("manageCategoriesButton").addEventListener("click", () => {
+      openModal("categoriesModal");
+    });
+
+    document.querySelectorAll("[data-close-modal]").forEach(button => {
+      button.addEventListener("click", closeModal);
+    });
+
+    document.getElementById("modalBackdrop").addEventListener("click", event => {
+      if (event.target.id === "modalBackdrop") {
+        closeModal();
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && activeModalId !== null) {
+        closeModal();
+      }
+    });
+
+    // Material transfers
+    function fillSelect(select, values, previousValue, emptyMessage) {
+      select.innerHTML = "";
+
+      if (values.length === 0) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = emptyMessage;
+        select.appendChild(option);
+        select.disabled = true;
+        return;
+      }
+
+      select.disabled = false;
+
+      values.forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      });
+
+      if (values.includes(previousValue)) {
+        select.value = previousValue;
+      }
+    }
+
+    function populateTransferMenus() {
+      const fromSelect = document.getElementById("transferFrom");
+      const toSelect = document.getElementById("transferTo");
+      const materialSelect = document.getElementById("transferMaterial");
+      const transferButton = document.getElementById("transferButton");
+
+      const previousFrom = fromSelect.value;
+      const previousTo = toSelect.value;
+      const previousMaterial = materialSelect.value;
+      const accounts = getAccountNames();
+      const materials = getAllMaterials();
+
+      fillSelect(fromSelect, accounts, previousFrom, "No accounts");
+      fillSelect(toSelect, accounts, previousTo, "No accounts");
+      fillSelect(materialSelect, materials, previousMaterial, "No materials");
+
+      if (accounts.length > 1 && (!previousTo || fromSelect.value === toSelect.value)) {
+        toSelect.value = accounts.find(name => name !== fromSelect.value) ?? accounts[0];
+      }
+
+      transferButton.disabled = accounts.length < 2 || materials.length === 0;
+    }
+
+    function transferMaterial() {
+      const from = document.getElementById("transferFrom").value;
+      const to = document.getElementById("transferTo").value;
+      const material = document.getElementById("transferMaterial").value;
+      const amountInput = document.getElementById("transferAmount");
+      const amount = Math.floor(Number(amountInput.value));
+      const message = document.getElementById("transferMessage");
+
+      message.classList.remove("error", "success");
+
+      if (from === to) {
+        message.textContent = "Choose two different accounts.";
+        message.classList.add("error");
+        return;
+      }
+
+      if (!Number.isFinite(amount) || amount < 1) {
+        message.textContent = "Enter an amount of at least 1.";
+        message.classList.add("error");
+        return;
+      }
+
+      const available = getAmount(from, material);
+
+      if (available < amount) {
+        message.textContent = `${from} only has ${available} ${material}.`;
+        message.classList.add("error");
+        return;
+      }
+
+      trackerData.accounts[from][material] = available - amount;
+      trackerData.accounts[to][material] = getAmount(to, material) + amount;
+
+      saveData();
+      renderEverything();
+
+      message.textContent = `Moved ${amount} ${material} from ${from} to ${to}.`;
+      message.classList.add("success");
+    }
+
+    document.getElementById("transferButton").addEventListener("click", transferMaterial);
+
+    // Backups and reset
+    function exportBackup() {
+      const backupText = JSON.stringify(trackerData, null, 2);
+      const blob = new Blob([backupText], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      const date = new Date().toISOString().slice(0, 10);
+
+      link.href = url;
+      link.download = `hay-day-material-backup-${date}.json`;
+      link.click();
+
+      URL.revokeObjectURL(url);
+      showToast("Backup exported.");
+    }
+
+    function importBackup(file) {
+      const reader = new FileReader();
+
+      reader.addEventListener("load", () => {
+        try {
+          const imported = JSON.parse(reader.result);
+          const normalized = normalizeData(imported);
+
+          if (Object.keys(normalized.accounts).length === 0 && !imported.accounts) {
+            throw new Error("The backup does not contain account data.");
+          }
+
+          trackerData = normalized;
+          activeTab = trackerData.categoryOrder[0] ?? OVERVIEW_TAB;
+          saveData();
+          renderEverything();
+          showToast("Backup imported successfully.");
+        } catch (error) {
+          showToast(`The backup could not be imported: ${error.message}`, true);
+        }
+      });
+
+      reader.readAsText(file);
+    }
+
+    document.getElementById("exportButton").addEventListener("click", exportBackup);
+
+    document.getElementById("importButton").addEventListener("click", () => {
+      document.getElementById("importFile").click();
+    });
+
+    document.getElementById("importFile").addEventListener("change", event => {
+      const file = event.target.files[0];
+
+      if (file) {
+        importBackup(file);
+      }
+
+      event.target.value = "";
+    });
+
+    document.getElementById("resetButton").addEventListener("click", () => {
+      const confirmed = confirm(
+        "Reset to the public starter setup?\n\nAll accounts and other changes you added will be removed."
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      trackerData = cloneData(INITIAL_DATA);
+      activeTab = trackerData.categoryOrder[0];
+      saveData();
+      renderEverything();
+      showToast("The tracker was reset.");
+    });
+
+    // Start the tracker
+    trackerData = normalizeData(trackerData);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(trackerData));
+    renderEverything();
+  </script>
+</body>
+</html>
