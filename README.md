@@ -1,8 +1,10 @@
 # Hay Day Material Tracker
 
+[**Open the live Hay Day Material Tracker**](https://lightlytoastedangel.github.io/Hay-Day-Material-Tracker-Tool/)
+
 A customizable, offline-friendly material tracker for organizing Hay Day items across multiple farms or storage accounts.
 
-The tracker runs entirely in your browser and includes automatic totals, account-to-account transfers, customizable categories, local saving, and backup import/export.
+The tracker runs entirely in your browser and includes automatic totals, barn and silo capacity tracking, upgrade planning, account-to-account transfers, customizable categories, local saving, and backup import/export.
 
 > [!IMPORTANT]
 > This is an unofficial fan-made tool. Accounts created in the tracker are only local labels for organizing materials. They are not connected to, authenticated with, or synchronized with Hay Day or Supercell in any way.
@@ -10,6 +12,9 @@ The tracker runs entirely in your browser and includes automatic totals, account
 ## Features
 
 - Add, rename, and remove tracker accounts
+- Track Barn and Silo capacity separately for every account
+- Assign every material to Barn or Silo storage
+- Create upgrade goals with live progress and account breakdowns
 - Add, rename, move, and remove materials
 - Add, rename, reorder, and remove categories
 - Safely move materials before deleting a used category
@@ -21,6 +26,16 @@ The tracker runs entirely in your browser and includes automatic totals, account
 - Export and import JSON backups
 - Responsive dark interface
 - Works without a server after the page has loaded
+
+## Default categories
+
+A new tracker starts with these editable categories:
+
+- **Upgrade Materials:** Bolt, Plank, Duct Tape, Nail, Screw, and Wood Panel
+- **Expansion Materials:** Mallet, Marker Stake, Land Deed, and Expansion Permit
+- **Tools:** Saw, Axe, TNT Barrel, Dynamite, and Shovel
+
+All categories and materials can be renamed, reordered, added, moved, or removed from within the tracker.
 
 ## Use the tracker
 
@@ -34,6 +49,8 @@ Open the published GitHub Pages site in a modern browser.
 
 The names are only used inside the tracker. They do not need to match a real Supercell ID or Hay Day farm name.
 
+New accounts start with a Barn capacity of `50` and a Silo capacity of `50`. Use the capacity controls on an account card to adjust either value in steps of 25, or enter an exact capacity directly.
+
 ### 2. Update material quantities
 
 Open a category tab and find the account you want to update.
@@ -42,7 +59,10 @@ Open a category tab and find the account you want to update.
 - Select **−** to remove one item.
 - Enter a number directly to replace the current quantity.
 
-Totals update automatically.
+Totals update automatically. Each material is labeled as a Barn or Silo item, and the account cards update their tracked storage usage automatically.
+
+> [!NOTE]
+> Storage usage only includes materials tracked by this tool. It cannot see other items in the actual in-game Barn or Silo.
 
 ### 3. Transfer materials
 
@@ -56,6 +76,25 @@ Use **Transfer materials between accounts** near the bottom of the page.
 
 The tracker prevents transfers that exceed the quantity available on the source account.
 
+## Upgrade planner
+
+Select **Upgrade planner** to create goals such as a Barn upgrade, Silo upgrade, or land expansion.
+
+1. Add a goal name.
+2. Choose a material.
+3. Enter the required quantity.
+4. Add or update the requirement.
+
+Each requirement shows:
+
+- The combined quantity across every tracker account
+- The required quantity
+- How many are still missing, or whether it is ready
+- Which accounts currently hold the material
+- Whether the material belongs in the Barn or Silo
+
+Changing account quantities updates every goal automatically.
+
 ## Manage materials
 
 Select **Manage materials** to:
@@ -63,9 +102,10 @@ Select **Manage materials** to:
 - Add a new material
 - Rename an existing material
 - Move a material to another category
+- Change whether it is stored in the Barn or Silo
 - Delete a material
 
-Renaming or moving a material preserves its quantities.
+Renaming, moving, or changing the storage location of a material preserves its quantities and updates storage totals and upgrade goals automatically.
 
 Deleting a material removes it and its quantities from every account, so the tracker asks for confirmation first.
 
@@ -111,6 +151,9 @@ The backup contains:
 - Categories
 - Materials
 - Quantities
+- Barn and Silo capacities
+- Material storage locations
+- Upgrade goals
 - Category order
 
 ### Import a backup
@@ -125,7 +168,7 @@ Export the current data before importing another backup if you may want to resto
 
 Select **Reset all data** to return the tracker to its original public setup.
 
-This removes added accounts, custom categories, custom materials, and entered quantities. Export a backup first if needed.
+This removes added accounts, capacities, upgrade goals, custom categories, custom materials, and entered quantities. Export a backup first if needed.
 
 ## Run it locally
 
@@ -187,7 +230,7 @@ That file contains:
 
 - **HTML** for the page structure
 - **CSS** for the dark theme and responsive layout
-- **JavaScript** for accounts, materials, categories, totals, transfers, saving, and backups
+- **JavaScript** for accounts, capacities, storage locations, upgrade goals, materials, categories, totals, transfers, saving, and backups
 
 Keeping everything in one file makes the project easy to host, share, and modify.
 
@@ -205,7 +248,8 @@ JavaScript and browser storage must be enabled.
 
 ## Limitations
 
-- The tracker cannot read your Hay Day barn or silo automatically.
+- The tracker cannot read your Hay Day Barn or Silo automatically.
+- Barn and Silo usage totals include only the materials entered into this tracker.
 - It does not connect to Hay Day, Supercell ID, or Supercell servers.
 - Data does not automatically synchronize across browsers or devices.
 - Browser data may be lost if site storage is cleared without a backup.
